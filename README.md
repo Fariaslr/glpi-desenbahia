@@ -1,4 +1,4 @@
-Segue um exemplo de **README** para documentar o seu ambiente **Docker Compose** com MariaDB e GLPI. Você pode ajustar conforme as necessidades do seu projeto.
+Aqui está o **README.md** atualizado e incluindo os novos dados fornecidos:
 
 ---
 
@@ -6,10 +6,13 @@ Segue um exemplo de **README** para documentar o seu ambiente **Docker Compose**
 
 Este repositório contém um ambiente configurado para rodar o GLPI integrado ao MariaDB utilizando **Docker Compose**.
 
+---
+
 ## **Estrutura do Projeto**
 
 - **`docker-compose.yml`**: Arquivo principal para configurar os serviços Docker.
 - **`mariadb.env`**: Arquivo com variáveis de ambiente para configuração do MariaDB.
+- **Backup de Banco de Dados**: Processo para criar e restaurar backups do banco GLPI.
 
 ---
 
@@ -18,60 +21,34 @@ Este repositório contém um ambiente configurado para rodar o GLPI integrado ao
 ### **1. MariaDB**
 Banco de dados relacional utilizado pelo GLPI.
 
-- **Imagem:** `mariadb:latest`
-- **Porta:** `3306` (exposta para conexão externa)
+- **Imagem:** `mariadb:10.7`
+- **Hostname:** `mariadb`
+- **Rede:** `glpi-network`
+- **Porta:** `3306` (internamente, não exposta diretamente)
 - **Credenciais:** Configuradas no arquivo `mariadb.env`.
 
 ### **2. GLPI**
 Sistema de gerenciamento de serviços de TI.
 
-- **Imagem:** `glpi/glpi:latest`
-- **Porta:** `80` (exposta para acesso via navegador)
-
----
-
-## **Pré-requisitos**
-
-Certifique-se de que o Docker e o Docker Compose estão instalados no sistema:
-
-### **Instalar Docker**
-```bash
-sudo apt update
-sudo apt install docker.io
-```
-
-### **Instalar Docker Compose**
-```bash
-sudo apt install docker-compose
-```
+- **Imagem:** `diouxx/glpi`
+- **Hostname:** `glpi`
+- **Rede:** `glpi-network`
+- **Porta:** `8081` (para acesso via navegador)
 
 ---
 
 ## **Configuração do Projeto**
 
-### **1. Clonar o Repositório**
-```bash
-git clone <URL_DO_REPOSITORIO>
-cd docker-compose
-```
+### **1. Arquivo `docker-compose.yml`**
 
-### **2. Configurar Variáveis de Ambiente**
-
-Crie ou edite o arquivo `mariadb.env` com as seguintes configurações:
-
-```env
-MARIADB_ROOT_PASSWORD=root_password
-MARIADB_DATABASE=glpi
-MARIADB_USER=root
-MARIADB_PASSWORD=root_password
-```
-
-### **3. Arquivo `docker-compose.yml`**
-Certifique-se de que o `docker-compose.yml` está configurado corretamente. Um exemplo básico:
+Certifique-se de que o arquivo contém o seguinte conteúdo:
 
 ```yaml
+version: '3.8'
+
 services:
-#MariaDB Container
+
+  # MariaDB Container
   mariadb:
     image: mariadb:10.7
     container_name: mariadb
@@ -81,13 +58,8 @@ services:
     networks:
       - glpi-network
     restart: always
- 
-#glpi/glpi conta de administrador,
-#tech/tech conta de técnico,
-#normal/normal conta «normal»,
-#post-only/postonly conta somente pós-publicação.
- 
-#GLPI Container
+
+  # GLPI Container
   glpi:
     image: diouxx/glpi
     container_name: glpi
@@ -97,70 +69,87 @@ services:
     networks:
       - glpi-network
     restart: always
- 
+
 networks:
   glpi-network:
     driver: bridge
 ```
 
----
+### **2. Arquivo `mariadb.env`**
 
-## **Iniciar os Serviços**
+Crie um arquivo `mariadb.env` com o seguinte conteúdo:
 
-Para iniciar o ambiente, execute:
-
-```bash
-docker-compose up -d
+```env
+MARIADB_ROOT_PASSWORD=diouxx
+MARIADB_DATABASE=glpi
+MARIADB_USER=glpi_user
+MARIADB_PASSWORD=glpi
 ```
 
+### **3. Rede**
+
+Certifique-se de que a rede `glpi-network` será gerenciada pelo Docker (já especificada no `docker-compose.yml`).
+
 ---
 
-## **Acessar o GLPI**
+## **Iniciar o Ambiente**
 
-Após iniciar os containers:
+1. Execute o comando para subir os containers em modo **detached**:
+   ```bash
+   docker-compose up -d
+   ```
 
-1. Abra o navegador e acesse: [http://localhost](http://localhost)
-2. Siga as instruções de instalação do GLPI.
-3. Utilize as credenciais configuradas no arquivo `mariadb.env` para conectar ao banco.
+2. Verifique se os serviços estão rodando:
+   ```bash
+   docker-compose ps
+   ```
+
+3. Acesse o GLPI em: [http://localhost:8081](http://localhost:8081)
+
+---
+
+## **Contas de Acesso Padrão**
+
+| **Usuário**  | **Senha**     | **Descrição**         |
+|--------------|---------------|-----------------------|
+| `glpi`       | `glpi`        | Conta de administrador|
+| `tech`       | `tech`        | Conta de técnico      |
+| `normal`     | `normal`      | Conta de usuário normal|
+| `post-only`  | `postonly`    | Conta de post-only    |
+
+---
+
+## **Backup e Restauração do Banco de Dados**
+
+### **Backup**
+Para criar um backup do banco de dados GLPI:
+```bash
+docker exec mariadb mysqldump -u root -p glpi > /backup/glpi_database.sql
+```
+
+### **Restauração**
+Para restaurar o banco de dados:
+```bash
+docker exec -i mariadb mysql -u root -p glpi < /backup/glpi_database.sql
+```
 
 ---
 
 ## **Comandos Úteis**
 
-### **Verificar o Status dos Containers**
+### **Verificar os Logs**
 ```bash
-docker-compose ps
+docker-compose logs
 ```
 
-### **Parar os Containers**
+### **Reiniciar os Containers**
+```bash
+docker-compose restart
+```
+
+### **Remover o Ambiente**
 ```bash
 docker-compose down
-```
-
-### **Acessar o Container MariaDB**
-```bash
-docker exec -it mariadb bash
-```
-
-### **Acessar o Banco de Dados MariaDB**
-```bash
-docker exec -it mariadb mysql -u root -p
-```
-
----
-
-## **Manutenção**
-
-### **Backup do Banco de Dados**
-Para realizar o backup do banco de dados:
-```bash
-docker exec mariadb mysqldump -u root -p glpi > backup.sql
-```
-
-### **Restauração do Banco de Dados**
-Para restaurar o backup:
-```bash
-docker exec -i mariadb mysql -u root -p glpi < backup.sql
 ```
 
 ---
@@ -168,17 +157,11 @@ docker exec -i mariadb mysql -u root -p glpi < backup.sql
 ## **Problemas Comuns**
 
 1. **Erro de conexão com o banco de dados:**
-   - Certifique-se de que o arquivo `mariadb.env` está configurado corretamente.
-   - Verifique o mapeamento de portas no `docker-compose.yml`.
+   - Verifique as credenciais no arquivo `mariadb.env`.
+   - Certifique-se de que o MariaDB foi inicializado corretamente.
 
-2. **Containers não iniciam:**
-   - Verifique os logs com:
+2. **Permissões em diretórios de backup:**
+   - Ajuste permissões:
      ```bash
-     docker-compose logs
-     ```
-
-3. **Permissões em volumes:**
-   - Ajuste permissões dos volumes para evitar erros:
-     ```bash
-     sudo chmod -R 777 mariadb_data glpi_data
+     sudo chmod -R 777 /backup
      ```
