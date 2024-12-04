@@ -1,0 +1,31 @@
+services:
+#MariaDB Container
+  mariadb:
+    image: mariadb:10.7
+    container_name: mariadb
+    hostname: mariadb
+    env_file:
+      - ./mariadb.env
+    networks:
+      - glpi-network
+    restart: always
+ 
+#glpi/glpi conta de administrador,
+#tech/tech conta de técnico,
+#normal/normal conta «normal»,
+#post-only/postonly conta somente pós-publicação.
+ 
+#GLPI Container
+  glpi:
+    image: diouxx/glpi
+    container_name: glpi
+    hostname: glpi
+    ports:
+      - "8081:80"
+    networks:
+      - glpi-network
+    restart: always
+ 
+networks:
+  glpi-network:
+    driver: bridge
