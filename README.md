@@ -182,7 +182,3 @@ docker exec -i mariadb mysql -u root -p glpi < backup.sql
      ```bash
      sudo chmod -R 777 mariadb_data glpi_data
      ```
-
----
-
-Com este **README**, você terá toda a documentação básica para configurar, executar e manter seu ambiente Docker com GLPI e MariaDB. Se precisar de algo mais, é só pedir! 😊
