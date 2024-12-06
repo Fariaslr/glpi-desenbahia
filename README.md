@@ -51,6 +51,8 @@ services:
   # MariaDB Container
   mariadb:
     image: mariadb:10.7
+    ports:
+      - "3306:3306"
     container_name: mariadb
     hostname: mariadb
     env_file:
