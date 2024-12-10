@@ -1,3 +1,4 @@
+version: '3.1'
 services:
 #MariaDB Container
   mariadb:
@@ -27,10 +28,6 @@ services:
     networks:
       - glpi-network
     restart: always
- 
-networks:
-  glpi-network:
-    driver: bridge
 
   metabase:
       image: metabase/metabase:latest
@@ -43,3 +40,8 @@ networks:
         MB_DB_USER: root
         MB_DB_PASS: dioux
         MB_DB_HOST: mariadb
+networks:
+  glpi-network:
+    driver: bridge
+
+  
