@@ -168,17 +168,3 @@ docker-compose restart
 ```bash
 docker-compose down
 ```
-
----
-
-## **Problemas Comuns**
-
-1. **Erro de conexão com o banco de dados:**
-   - Verifique as credenciais no arquivo `mariadb.env`.
-   - Certifique-se de que o MariaDB foi inicializado corretamente.
-
-2. **Permissões em diretórios de backup:**
-   - Ajuste permissões:
-     ```bash
-     sudo chmod -R 777 /backup
-     ```
