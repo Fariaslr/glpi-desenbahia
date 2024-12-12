@@ -26,6 +26,7 @@ services:
 
   # Metabase Container
   metabase:
+    container_name: metabase
     image: metabase/metabase:latest
     ports:
       - "3000:3000"
