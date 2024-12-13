@@ -12,6 +12,11 @@ services:
       - glpi-network
     restart: always
 
+#glpi/glpi conta de administrador,
+#tech/tech conta de técnico,
+#normal/normal conta «normal»,
+#post-only/postonly conta somente pós-publicação.
+
   # GLPI Container
   glpi:
     image: diouxx/glpi

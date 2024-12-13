@@ -45,8 +45,7 @@ Certifique-se de que o arquivo contém o seguinte conteúdo:
 
 ```yaml
 services:
-
-#MariaDB Container
+  # MariaDB Container
   mariadb:
     image: mariadb:10.7
     ports:
@@ -58,13 +57,13 @@ services:
     networks:
       - glpi-network
     restart: always
- 
+
 #glpi/glpi conta de administrador,
 #tech/tech conta de técnico,
 #normal/normal conta «normal»,
 #post-only/postonly conta somente pós-publicação.
- 
-#GLPI Container
+
+  # GLPI Container
   glpi:
     image: diouxx/glpi
     container_name: glpi
@@ -74,22 +73,27 @@ services:
     networks:
       - glpi-network
     restart: always
- 
+
+  # Metabase Container
+  metabase:
+    container_name: metabase
+    image: metabase/metabase:latest 
+    ports:
+      - "3000:3000"
+    environment:
+      MB_DB_TYPE: mysql
+      MB_DB_DBNAME: metabase
+      MB_DB_PORT: 3306
+      MB_DB_USER: glpi_user
+      MB_DB_PASS: dioux
+      MB_DB_HOST: mariadb
+    networks:
+      - glpi-network
+    restart: always
+
 networks:
   glpi-network:
     driver: bridge
-
-  metabase:
-      image: metabase/metabase:latest
-      ports:
-        - "3000:3000"
-      environment:
-        MB_DB_TYPE: mysql
-        MB_DB_DBNAME: metabase
-        MB_DB_PORT: 3306
-        MB_DB_USER: root
-        MB_DB_PASS: dioux
-        MB_DB_HOST: mariadb
 ```
 
 ### **2. Arquivo `mariadb.env`**
@@ -100,7 +104,7 @@ Crie um arquivo `mariadb.env` com o seguinte conteúdo:
 MARIADB_ROOT_PASSWORD=diouxx
 MARIADB_DATABASE=glpi
 MARIADB_USER=glpi_user
-MARIADB_PASSWORD=glpi
+MARIADB_PASSWORD=diouxx
 ```
 
 ### **3. Rede**
